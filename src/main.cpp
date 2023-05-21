@@ -5,6 +5,7 @@
 #include "SoftwareSerial.h"
 
 const byte pinHoorn = 12;
+bool lastHornState = true;
 
 const int passwordLength = 4;
 char inputPassword[passwordLength];
@@ -33,6 +34,7 @@ void resetPassword() {
     for (int i = 0; i < passwordLength; i++) {
         inputPassword[i] = 0;
     }
+    passwordIndex = 0;
 }
 
 void setup() {
@@ -68,7 +70,18 @@ void setup() {
 void loop() {
     bool phoneActive = !digitalRead(pinHoorn);
 
-    if (phoneActive) {
+    if (lastHornState != phoneActive) {
+        lastHornState = phoneActive;
+
+        if (lastHornState) {
+            myDFPlayer.play(2);
+        } else {
+            myDFPlayer.stop();
+            resetPassword();
+        }
+    }
+
+    if (lastHornState) {
         char key_pressed = keypadKey.getKey();
 
         if (key_pressed) {
@@ -88,18 +101,14 @@ void loop() {
 
                 if (!(strncmp(inputPassword, correctPassword, passwordLength))) {
                     Serial.println("correct");
-                    myDFPlayer.play(2);
+                    myDFPlayer.play(3);
                 } else {
                     Serial.println("niet correct");
                     myDFPlayer.play(1);
                 }
 
                 resetPassword();
-                passwordIndex = 0;
             }
         }
-    } else {
-        myDFPlayer.stop();
-        resetPassword();
     }
 }
