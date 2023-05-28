@@ -74,8 +74,9 @@ void loop() {
         lastHornState = phoneActive;
 
         if (lastHornState) {
-            delay(1000);  // beetje tijd geven aan de speler om de hoorn goed vast te pakken
-            myDFPlayer.play(2); // welkom
+            Serial.println("hoorn afgehaakt");
+            delay(1000);         // beetje tijd geven aan de speler
+            myDFPlayer.play(2);  // welkom
         } else {
             myDFPlayer.stop();
             resetPassword();
@@ -86,10 +87,12 @@ void loop() {
         char key_pressed = keypadKey.getKey();
 
         if (key_pressed) {
+            Serial.println(key_pressed);
             inputPassword[passwordIndex] = key_pressed;
             passwordIndex++;
 
             if (passwordIndex >= passwordLength) {
+                delay(500); 
                 if (!(strncmp(inputPassword, correctPassword, passwordLength))) {
                     myDFPlayer.play(3);  // correct
                 } else {
